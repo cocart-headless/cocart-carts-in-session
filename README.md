@@ -34,6 +34,14 @@ Download the latest release and upload to your WordPress dashboard via the plugi
 
 You will then see a new sub-menu under CoCart called **Carts in Session**.
 
+## Screenshots
+
+![No Carts](https://cocart.xyz/wp-content/uploads/2021/01/Carts-in-Session-No-Carts.png.webp)
+> No Carts in Session
+
+![Singular active cart](https://cocart.xyz/wp-content/uploads/2021/01/Carts-in-Session-1-active-cart-captured-with-date-created.png.webp)
+> 1 active cart captured with date cart created.
+
 ## To Do
 
 - [ ] Add styling to adjust column width.
