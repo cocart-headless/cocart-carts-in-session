@@ -1,0 +1,70 @@
+{
+	"name": "co-cart/cocart-carts-in-session",
+	"description": "Allows you to view all the carts in session via the WordPress admin.",
+	"homepage": "https://cocart.xyz",
+	"type": "wordpress-plugin",
+	"keywords": [
+		"wordpress",
+		"wordpress-development",
+		"feature-plugin",
+		"plugin",
+		"woocommerce",
+		"woocommerce-extension",
+		"woocommerce-plugin",
+		"e-commerce",
+		"cocart"
+	],
+	"license": "GPL-3.0-or-later",
+	"prefer-stable": true,
+	"minimum-stability": "dev",
+	"authors": [
+		{
+			"name": "Sébastien Dumont",
+			"email": "mailme@sebastiendumont.com",
+			"homepage": "https://sebastiendumont.com",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/co-cart/cocart-carts-in-session/issues"
+	},
+	"autoload": {
+		"classmap": [
+			"includes/"
+		]
+	},
+	"require": {
+		"composer/installers": "1.9.0",
+		"woocommerce/woocommerce-sniffs": "0.0.9"
+	},
+	"require-dev": {
+		"wp-cli/i18n-command": "2.2.6",
+		"phpunit/phpunit": "8.5.9",
+		"squizlabs/php_codesniffer": "3.5.8"
+	},
+	"scripts": {
+		"phpcs": [
+			"phpcs . -s -p -n"
+		],
+		"phpcs-pre-commit": [
+			"phpcs . -s -p -n"
+		],
+		"phpcbf": [
+			"phpcbf . -p"
+		],
+		"makepot-audit": [
+			"wp --allow-root i18n make-pot . --exclude=\".github,.wordpress-org,bin,node_modules,tests\" --slug=cocart-carts-in-session"
+		],
+		"makepot": [
+			"@makepot-audit --skip-audit"
+		]
+	},
+	"extra": {
+		"scripts-description": {
+			"phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
+			"phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
+			"makepot-audit": "Generate langauges/cocart-carts-in-session.pot file and run audit",
+			"makepot": "Generate langauges/cocart-carts-in-session.pot file"
+		}
+	}
+}
