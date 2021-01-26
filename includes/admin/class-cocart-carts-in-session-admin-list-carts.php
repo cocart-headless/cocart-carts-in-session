@@ -488,7 +488,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 			}
 
 			// Register WooCommerce Admin Bar.
-			if ( CoCart_Helpers::is_wc_version_gte( '4.0' ) && function_exists( 'wc_admin_connect_page' ) ) {
+			if ( CoCart_Carts_in_Session_Helpers::is_wc_version_gte( '4.0' ) && function_exists( 'wc_admin_connect_page' ) ) {
 				wc_admin_connect_page(
 					array(
 						'id'        => 'cocart-carts-in-session',

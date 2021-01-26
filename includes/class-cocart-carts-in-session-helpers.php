@@ -620,4 +620,4 @@ class CoCart_Carts_in_Session_Helpers {
 
 } // END class
 
-return new CoCart_Helpers();
+return new CoCart_Carts_in_Session_Helpers();

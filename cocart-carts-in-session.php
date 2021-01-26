@@ -2,10 +2,10 @@
 /*
  * Plugin Name: CoCart - Carts in Session
  * Plugin URI:  https://cocart.xyz
- * Description: Enables the ability to view all the carts in session via the admin.
+ * Description: Allows you to view all the carts in session via the WordPress admin.
  * Author:      Sébastien Dumont
  * Author URI:  https://sebastiendumont.com
- * Version:     1.0.0-alpha.1
+ * Version:     1.0.0-alpha.2
  * Text Domain: cocart-carts-in-session
  * Domain Path: /languages/
  *
