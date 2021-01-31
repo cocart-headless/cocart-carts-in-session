@@ -267,7 +267,13 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 */
 		public function column_item_count( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
-			$item_count = count( (array) maybe_unserialize( $cart_value['cart'] ) );
+			$cart       = maybe_unserialize( $cart_value['cart'] );
+
+			$item_count = 0;
+
+			foreach( $cart as $item ) {
+				$item_count = $item_count + ( 1 * $item['quantity'] );
+			}
 
 			return $item_count;
 		}
