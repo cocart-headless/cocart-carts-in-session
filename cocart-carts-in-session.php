@@ -5,7 +5,7 @@
  * Description: Allows you to view all the carts in session via the WordPress admin.
  * Author:      Sébastien Dumont
  * Author URI:  https://sebastiendumont.com
- * Version:     1.0.0-alpha.2
+ * Version:     1.0.0-alpha.3
  * Text Domain: cocart-carts-in-session
  * Domain Path: /languages/
  *
