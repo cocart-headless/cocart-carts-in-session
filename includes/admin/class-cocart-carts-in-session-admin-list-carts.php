@@ -280,11 +280,14 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 * @return String
 		 */
 		public function column_value( $item ) {
-			$cart_value  = maybe_unserialize( $item['cart_value'] );
-			$cart_totals = maybe_unserialize( $cart_value['cart_totals'] );
-			$cart_value  = $cart_totals['total'];
+			$cart_value = maybe_unserialize( $item['cart_value'] );
 
-			return wc_price( $cart_value );
+			if ( isset( $cart_value['cart_totals'] ) ) {
+				$cart_totals = maybe_unserialize( $cart_value['cart_totals'] );
+				$cart_value  = $cart_totals['total'];
+			}
+
+			return ( ! is_array( $cart_value ) ) ? wc_price( $cart_value ) : wc_price( 0 );
 		}
 
 		/**
