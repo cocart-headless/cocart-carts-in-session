@@ -298,7 +298,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 * @return String
 		 */
 		public function column_date_created( $item ) {
-			if ( isset( $item['cart_created'] ) ) {
+			if ( isset( $item['cart_created'] ) && $item['cart_created'] > 0 ) {
 				$t_time    = get_the_time( 'Y/m/d g:i:s a' );
 				$m_time    = date('m/d/Y H:i:s', $item['cart_created'] );
 				$time      = mysql2date( 'G', $m_time, false );
