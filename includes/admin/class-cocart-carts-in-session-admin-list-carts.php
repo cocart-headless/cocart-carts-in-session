@@ -308,7 +308,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 
 				return '<time datetime="' . $h_time . '" title="' . $h_time . '">' . $h_time . '</time>';
 			} else {
-				return 😄;
+				return '-';
 			}
 		}
 
