@@ -24,7 +24,7 @@ final class CoCart_Carts_in_Session {
 	 * @access public
 	 * @static
 	 */
-	public static $version = '1.0.0-alpha.3';
+	public static $version = '1.0.0-alpha.4';
 
 	/**
 	 * Required PHP Version

@@ -35,6 +35,78 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			 ) );
 
 			add_action( 'cocart_carts_in_session_table_bottom', array( $this, 'maybe_render_blank_state' ) );
+			?>
+			<style type="text/css">
+			.cocart_page_cocart-carts-in-session .wp-list-table th {
+				width: 12ch;
+				vertical-align: middle;
+			}
+
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-cart_key,
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-name,
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-email {
+				width: 18ch;
+			}
+
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-item_count,
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-date_created,
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-date_expires,
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
+				width: 6ch;
+			}
+
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
+				width: 8ch;
+				text-align: right;
+			}
+
+			.cocart_page_cocart-carts-in-session .wp-list-table tbody td,
+			.cocart_page_cocart-carts-in-session .wp-list-table tbody th {
+				padding: 0.8em;
+				line-height: 26px;
+			}
+
+			.cart-status {
+				display: -webkit-inline-box;
+				display: inline-flex;
+				line-height: 2.5em;
+				color: #777;
+				background: #e5e5e5;
+				border-radius: 4px;
+				border-bottom: 1px solid rgba(0,0,0,.05);
+				margin: -.25em 0;
+				cursor: inherit !important;
+				white-space: nowrap;
+				max-width: 100%;
+			}
+
+			.cart-status > span {
+				margin: 0 1em;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.cart-status.status-active {
+				background: #dcc8e1;
+				color: #4b2e53;
+			}
+
+			.cart-status.status-expiring {
+				background: #f8dda7;
+				color: #94660c;
+			}
+
+			.cart-status.status-abandoned {
+				background: #f8a7a7;
+				color: #94660c;
+			}
+
+			.cart-status.status-processing {
+				background: #c6e1c6;
+				color: #5b841b;
+			}
+		</style>
+		<?php
 		}
 
 		/**
@@ -45,10 +117,15 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 */
 		protected function get_views() { 
 			$status_links = array(
-				'all'       => sprintf( __( '<a href="%s">All (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::carts_in_session() ),
-				'abandoned' => sprintf( __( '<a href="%s">Abandoned (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_expired() ),
-				'expiring'  => sprintf( __( '<a href="%s">Expiring (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_expiring() )
+				'all' => sprintf( __( '<a href="%s">All (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::carts_in_session() )
 			);
+
+			if ( method_exists( CoCart_Admin_WC_System_Status, 'count_carts_active' ) ) {
+				$status_links['active'] = sprintf( __( '<a href="%s">Active (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_active() );
+			}
+
+			$status_links['abandoned'] = sprintf( __( '<a href="%s">Abandoned (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_expired() );
+			$status_links['expiring'] = sprintf( __( '<a href="%s">Expiring (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_expiring() );
 
 			return $status_links;
 		}
@@ -209,8 +286,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		public function column_email( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
 			$customer   = maybe_unserialize( $cart_value['customer'] );
-
-			$email = $customer['email'];
+			$email      = ! empty( $customer ) ? $customer['email'] : '';
 
 			if ( $email ) {
 				return '<a href="mailto:' . $email . '">' . $email . '</a>';
@@ -229,8 +305,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		public function column_phone( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
 			$customer   = maybe_unserialize( $cart_value['customer'] );
-
-			$phone = $customer['phone'];
+			$phone      = ! empty( $customer ) ? $customer['phone'] : '';
 
 			if ( $phone ) {
 				return $phone;
@@ -249,12 +324,41 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		public function column_status( $item ) {
 			$tooltip = "";
 
-			$status = "active"; // Default status
+			$time       = time();
+			$t_time     = get_the_time( 'Y/m/d g:i:s a' );
+			$expires    = date('m/d/Y H:i:s', $item['cart_expiry'] );
+			$expires    = mysql2date( 'G', $expires, false );
+			$time_ahead = ( HOUR_IN_SECONDS * 6 ) + $time;
+
+			$status = "active"; // Default cart status.
+
+			// If the cart is 6 hours away or less from cart expiration then the cart status is "expiring".
+			if ( $time_ahead > $expires && $time < $expires ) {
+				$status  = "expiring";
+				$tooltip = wc_sanitize_tooltip( esc_html__( 'Cart will be expiring soon.', 'cocart-carts-in-session') );
+			}
+
+			// If the cart expiration is less than the time it is now then the cart status is "abondoned".
+			if ( $time > $expires ) {
+				$status     = "abandoned"; // a.k.a "Expired"
+				$cart_value = maybe_unserialize( $item['cart_value'] );
+				$customer   = maybe_unserialize( $cart_value['customer'] );
+				$customer   = ! empty( $customer ) ? $customer : '';
+				$tooltip    = wc_sanitize_tooltip( esc_html__( 'Cart was abondoned.', 'cocart-carts-in-session') );
+			}
+
+			$order_id = absint( $item['order_awaiting_payment'] );
+			$order              = $order_id ? wc_get_order( $order_id ) : null;
+
+			if ( $order && $order->has_status( array( 'pending', 'failed' ) ) ) {
+				$status  = "processing";
+				$tooltip = wc_sanitize_tooltip( esc_html__( 'Cart is currently processing.', 'cocart-carts-in-session') );
+			}
 
 			if ( $tooltip ) {
-				printf( '<mark class="order-status %s tips" data-tip="%s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $status ) ), wp_kses_post( $tooltip ), esc_html( $this->get_cart_status_name( $status ) ) );
+				printf( '<mark class="cart-status %s tips" data-tip="%s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $status ) ), wp_kses_post( $tooltip ), esc_html( $this->get_cart_status_name( $status ) ) );
 			} else {
-				printf( '<mark class="order-status %s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $status ) ), esc_html( $this->get_cart_status_name( $status ) ) );
+				printf( '<mark class="cart-status %s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $status ) ), esc_html( $this->get_cart_status_name( $status ) ) );
 			}
 		}
 
@@ -304,18 +408,30 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 * @return String
 		 */
 		public function column_date_created( $item ) {
-			if ( isset( $item['cart_created'] ) && $item['cart_created'] > 0 ) {
-				$t_time    = get_the_time( 'Y/m/d g:i:s a' );
-				$m_time    = date('m/d/Y H:i:s', $item['cart_created'] );
-				$time      = mysql2date( 'G', $m_time, false );
-				$time_diff = time() - $time;
-		
-				$h_time = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $m_time );
+			$timestamp = isset( $item['cart_created'] ) ? $item['cart_created'] : '';
 
-				return '<time datetime="' . $h_time . '" title="' . $h_time . '">' . $h_time . '</time>';
-			} else {
-				return '-';
+			if ( ! $timestamp ) {
+				return '&ndash;';
 			}
+
+			$t_time    = get_the_time( 'Y/m/d g:i:s a' );
+			$m_time    = date('m/d/Y H:i:s', $item['cart_created'] );
+			$time      = mysql2date( 'G', $m_time, false );
+			$time_diff = time() - $time;
+	
+			$h_time = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $m_time );
+
+			if ( $timestamp > strtotime( '-1 day', time() ) && $timestamp <= time() ) {
+				$show_date = sprintf(
+					/* translators: %s: human-readable time difference */
+					_x( '%s ago', '%s = human-readable time difference', 'cocart-carts-in-session' ),
+					human_time_diff( $timestamp, time() )
+				);
+			} else {
+				$show_date = wp_date( 'M j, Y', $timestamp );
+			}
+
+			return '<time datetime="' . $h_time . '" title="' . $h_time . '">' . esc_html( $show_date ) . '</time>';
 		}
 
 		/**
@@ -326,6 +442,12 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 * @return String
 		 */
 		public function column_date_expires( $item ) {
+			$timestamp = isset( $item['cart_expiry'] ) ? $item['cart_expiry'] : '';
+
+			if ( ! $timestamp ) {
+				return '&ndash;';
+			}
+
 			$t_time    = get_the_time( 'Y/m/d g:i:s a' );
 			$m_time    = date('m/d/Y H:i:s', $item['cart_expiry'] );
 			$time      = mysql2date( 'G', $m_time, false );
@@ -333,7 +455,17 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 	
 			$h_time = mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $m_time );
 
-			return '<time datetime="' . $h_time . '" title="' . $h_time . '">' . $h_time . '</time>';
+			if ( $timestamp > strtotime( '-1 day', time() ) && $timestamp <= time() ) {
+				$show_date = sprintf(
+					/* translators: %s: human-readable time difference */
+					_x( '%s ago', '%s = human-readable time difference', 'cocart-carts-in-session' ),
+					human_time_diff( $timestamp, time() )
+				);
+			} else {
+				$show_date = wp_date( 'M j, Y', $timestamp );
+			}
+
+			return '<time datetime="' . $h_time . '" title="' . $h_time . '">' . esc_html( $show_date ). '</time>';
 		}
 
 		/**
@@ -350,9 +482,9 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				'phone'        => __( 'Phone Captured', 'cocart-carts-in-session' ),
 				'status'       => __( 'Status', 'cocart-carts-in-session' ),
 				'item_count'   => __( 'No. Items', 'cocart-carts-in-session' ),
-				'value'        => __( 'Cart Value', 'cocart-carts-in-session' ),
 				'date_created' => __( 'Cart Created', 'cocart-carts-in-session' ),
-				'date_expires' => __( 'Cart Expires', 'cocart-carts-in-session' )
+				'date_expires' => __( 'Cart Expires', 'cocart-carts-in-session' ),
+				'value'        => __( 'Cart Value', 'cocart-carts-in-session' ),
 			) );
 		}
 
@@ -461,7 +593,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 		}
 
 		/**
-		 * Undocumented function
+		 * Sets the number of carts to show on screen per page.
 		 *
 		 * @param [type] $status
 		 * @param [type] $option
@@ -473,18 +605,27 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 		}
 
 		/**
-		 * Undocumented function
+		 * Adds "Carts in Session" admin menu and page.
 		 *
 		 * @access public
 		 * @return void
 		 */
 		public function carts_in_session() {
+			$parent_page = 'cocart';
+			$page_slug   = 'cocart-carts-in-session';
+
+			// If white label is enabled, move under WooCommerce.
+			if ( defined( 'COCART_WHITE_LABEL' ) && false !== COCART_WHITE_LABEL ) {
+				$parent_page = 'woocommerce';
+				$page_slug   = 'carts-in-session';
+			}
+
 			$hook = add_submenu_page(
-				'cocart',
+				$parent_page,
 				esc_attr__( 'Carts in Session', 'cocart-carts-in-session' ),
 				esc_attr__( 'Carts in Session', 'cocart-carts-in-session' ),
 				apply_filters( 'cocart_screen_capability', 'manage_options' ),
-				'cocart-carts-in-session',
+				$page_slug,
 				array( $this, 'list_carts_page' )
 			);
 
