@@ -13,4 +13,4 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 // Delete options.
 delete_site_option( 'cocart_carts_in_session_install_date' );
-delete_option( 'cocart_carts_in_session_version' );
+delete_site_option( 'cocart_carts_in_session_version' );
