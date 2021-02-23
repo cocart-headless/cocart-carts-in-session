@@ -1,7 +1,7 @@
 {
 	"title": "CoCart - Carts in Session",
 	"name": "cocart-carts-in-session",
-	"version": "1.0.0-alpha.4",
+	"version": "1.0.0",
 	"private": true,
 	"contributors": [
 		"sebd86"
