@@ -120,7 +120,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				'all' => sprintf( __( '<a href="%s">All (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::carts_in_session() )
 			);
 
-			if ( method_exists( CoCart_Admin_WC_System_Status, 'count_carts_active' ) ) {
+			if ( method_exists( 'CoCart_Admin_WC_System_Status', 'count_carts_active' ) ) {
 				$status_links['active'] = sprintf( __( '<a href="%s">Active (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_active() );
 			}
 
