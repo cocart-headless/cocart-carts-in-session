@@ -347,8 +347,8 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				$tooltip    = wc_sanitize_tooltip( esc_html__( 'Cart was abondoned.', 'cocart-carts-in-session') );
 			}
 
-			$order_id = absint( $item['order_awaiting_payment'] );
-			$order              = $order_id ? wc_get_order( $order_id ) : null;
+			$order_id = isset( $item['order_awaiting_payment'] ) ? absint( $item['order_awaiting_payment'] ) : '';
+			$order    = $order_id ? wc_get_order( $order_id ) : null;
 
 			if ( $order && $order->has_status( array( 'pending', 'failed' ) ) ) {
 				$status  = "processing";
