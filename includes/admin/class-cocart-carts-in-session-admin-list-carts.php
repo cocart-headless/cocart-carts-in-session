@@ -171,19 +171,25 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		public static function get_carts( $per_page = 20, $page_number = 1 ) {
 			global $wpdb;
 
-			$sql = "
-			SELECT * FROM {$wpdb->prefix}cocart_carts
-			";
+			$orderby = ! empty( $_GET['orderby'] ) ? wp_unslash( $_GET['orderby'] ) : 'cart_created';
+			$order   = ! empty( $_GET['order'] ) ? wp_unslash( $_GET['order'] ) : 'ASC';
 
-			if ( ! empty( $_REQUEST['orderby'] ) ) {
-				$sql .= ' ORDER BY ' . esc_sql( $_REQUEST['orderby'] );
-				$sql .= ! empty( $_REQUEST['order'] ) ? ' ' . esc_sql( $_REQUEST['order'] ) : ' ASC';
-			}
-
-			$sql .= " LIMIT $per_page";
-			$sql .= ' OFFSET ' . ( $page_number - 1 ) * $per_page;
-
-			$results = $wpdb->get_results( $sql, 'ARRAY_A' );
+			$results = $wpdb->get_results( 
+				$wpdb->prepare(
+					"
+					SELECT *
+					FROM {$wpdb->prefix}cocart_carts
+					WHERE 1=1
+					ORDER BY %s %s
+					LIMIT %d
+					OFFSET %d",
+					$orderby,
+					$order,
+					$per_page,
+					( $page_number - 1 ) * $per_page,
+				),
+				ARRAY_A
+			);
 
 			return $results;
 		}
