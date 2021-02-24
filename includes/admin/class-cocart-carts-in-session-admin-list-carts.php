@@ -120,7 +120,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				'all' => sprintf( __( '<a href="%s">All (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::carts_in_session() )
 			);
 
-			if ( method_exists( CoCart_Admin_WC_System_Status, 'count_carts_active' ) ) {
+			if ( method_exists( 'CoCart_Admin_WC_System_Status', 'count_carts_active' ) ) {
 				$status_links['active'] = sprintf( __( '<a href="%s">Active (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_active() );
 			}
 
@@ -171,19 +171,25 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		public static function get_carts( $per_page = 20, $page_number = 1 ) {
 			global $wpdb;
 
-			$sql = "
-			SELECT * FROM {$wpdb->prefix}cocart_carts
-			";
+			$orderby = ! empty( $_GET['orderby'] ) ? wp_unslash( $_GET['orderby'] ) : 'cart_created';
+			$order   = ! empty( $_GET['order'] ) ? wp_unslash( $_GET['order'] ) : 'ASC';
 
-			if ( ! empty( $_REQUEST['orderby'] ) ) {
-				$sql .= ' ORDER BY ' . esc_sql( $_REQUEST['orderby'] );
-				$sql .= ! empty( $_REQUEST['order'] ) ? ' ' . esc_sql( $_REQUEST['order'] ) : ' ASC';
-			}
-
-			$sql .= " LIMIT $per_page";
-			$sql .= ' OFFSET ' . ( $page_number - 1 ) * $per_page;
-
-			$results = $wpdb->get_results( $sql, 'ARRAY_A' );
+			$results = $wpdb->get_results( 
+				$wpdb->prepare(
+					"
+					SELECT *
+					FROM {$wpdb->prefix}cocart_carts
+					WHERE 1=1
+					ORDER BY %s %s
+					LIMIT %d
+					OFFSET %d",
+					$orderby,
+					$order,
+					$per_page,
+					( $page_number - 1 ) * $per_page,
+				),
+				ARRAY_A
+			);
 
 			return $results;
 		}
@@ -347,8 +353,8 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				$tooltip    = wc_sanitize_tooltip( esc_html__( 'Cart was abondoned.', 'cocart-carts-in-session') );
 			}
 
-			$order_id = absint( $item['order_awaiting_payment'] );
-			$order              = $order_id ? wc_get_order( $order_id ) : null;
+			$order_id = isset( $item['order_awaiting_payment'] ) ? absint( $item['order_awaiting_payment'] ) : '';
+			$order    = $order_id ? wc_get_order( $order_id ) : null;
 
 			if ( $order && $order->has_status( array( 'pending', 'failed' ) ) ) {
 				$status  = "processing";
@@ -562,14 +568,20 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 
 			$data = $this->get_carts( $per_page, $current_page );
 
+			/*
+			* The WP_List_Table class does not handle pagination for us, so we need
+			* to ensure that the data is trimmed to only the current page. We can use
+			* array_slice() to do that.
+			*/
+			$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
+
 			$total_items = $this->record_count();
 
-			$this->set_pagination_args( [
-				'total_items' => $total_items, //WE have to calculate the total number of items
-				'per_page'    => $per_page //WE have to determine how many items to show on a page
-			] );
-
-			$data = array_slice( $data, ( ($current_page-1 )*$per_page ), $per_page );
+			$this->set_pagination_args( array(
+				'total_items' => $total_items, // We have to calculate the total number of items.
+				'per_page'    => $per_page, // We have to determine how many items to show on a page.
+				'total_pages' => ceil( $total_items / $per_page ), // We have to calculate the total number of pages.
+			 ) );
 
 			$this->items = $data;
 		}
