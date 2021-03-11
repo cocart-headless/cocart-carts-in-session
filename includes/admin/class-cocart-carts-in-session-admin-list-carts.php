@@ -45,14 +45,14 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-cart_key,
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-name,
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-email {
-				width: 18ch;
+				width: 20ch;
 			}
 
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-item_count,
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-date_created,
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-date_expires,
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
-				width: 6ch;
+				width: 8.8ch;
 			}
 
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
@@ -97,8 +97,8 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			}
 
 			.cart-status.status-abandoned {
-				background: #f8a7a7;
-				color: #94660c;
+				background: #eba3a3;
+				color: #761919;
 			}
 
 			.cart-status.status-processing {
@@ -259,7 +259,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				'page' => 'cocart-carts-in-session',
 				'action' => 'view',
 				'cart' => $item['cart_key']
-			) );
+			), admin_url( 'admin.php' ) );
 
 			$actions = array(
 				'id'   => 'ID: ' . $item['cart_id'],
