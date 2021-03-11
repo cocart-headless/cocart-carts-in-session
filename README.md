@@ -1,4 +1,4 @@
-<h1 align="center">CoCart - Carts in Session <a href="https://github.com/co-cart/cocart-carts-in-session/releases/latest/"><img src="https://img.shields.io/static/v1?goVersion=&message=v1.0.0-alpha.4&label=&color=9a6fc4&style=flat-square"></a></h1>
+<h1 align="center">CoCart - Carts in Session <a href="https://github.com/co-cart/cocart-carts-in-session/releases/latest/"><img src="https://img.shields.io/static/v1?goVersion=&message=v1.0.0-alpha.5&label=&color=9a6fc4&style=flat-square"></a></h1>
 
 <p align="center">Allows you to view all the carts in session via the WordPress admin.</p>
 
