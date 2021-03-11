@@ -115,16 +115,24 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 * @access protected
 		 * @return Array $status_links
 		 */
-		protected function get_views() { 
-			$status_links = array(
-				'all' => sprintf( __( '<a href="%s">All (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::carts_in_session() )
-			);
+		protected function get_views() {
+			$status_links = array();
+			$current = ( ! empty( $_GET['cart_status'] ) ? esc_html( $_GET['cart_status'] ) : 'all' );
+
+			$class = ($current == 'all' ? ' class="current"' : '');
+			$all_url = remove_query_arg( 'cart_status' );
+			$status_links['all'] = sprintf( __( '<a href="%1$s"%2$s>All (%3$s)</a>', 'cocart-carts-in-session' ), $all_url, $class, CoCart_Admin_WC_System_Status::carts_in_session() );
 
 			if ( method_exists( 'CoCart_Admin_WC_System_Status', 'count_carts_active' ) ) {
-				$status_links['active'] = sprintf( __( '<a href="%s">Active (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_active() );
+				$class = ($current == 'active' ? ' class="current"' : '');
+				$active_url = add_query_arg( 'cart_status', 'active' );
+				$status_links['active'] = sprintf( __( '<a href="%1$s"%2$s>Active (%3$s)</a>', 'cocart-carts-in-session' ), $active_url, $class, CoCart_Admin_WC_System_Status::count_carts_active() );
 			}
 
-			$status_links['abandoned'] = sprintf( __( '<a href="%s">Abandoned (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_expired() );
+			$class = ($current == 'abandoned' ? ' class="current"' : '');
+			$abandoned_url = add_query_arg( 'cart_status', 'abandoned' );
+			$status_links['abandoned'] = sprintf( __( '<a href="%1$s"%2$s>Abandoned (%3$s)</a>', 'cocart-carts-in-session' ), $abandoned_url, $class, CoCart_Admin_WC_System_Status::count_carts_expired() );
+
 			$status_links['expiring'] = sprintf( __( '<a href="%s">Expiring (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_expiring() );
 
 			return $status_links;
