@@ -55,6 +55,13 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				width: 8.8ch;
 			}
 
+			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-item_count,
+			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-date_created,
+			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-date_expires,
+			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
+				width: 10ch;
+			}
+
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
 				width: 8ch;
 				text-align: right;
@@ -679,6 +686,33 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 						),
 					)
 				);
+			}
+
+			/**
+			 * Adds to the CoCart category for the new WooCommerce Navigation Menu if it exists.
+			 * If using a version of CoCart lower than v3 it will display under "Extensions".
+			 */
+			if ( class_exists( '\Automattic\WooCommerce\Admin\Features\Navigation\Menu' ) ) {
+				if ( version_compare( CoCart_Helpers::get_cocart_version(), '3.0.0', '<' ) ) {
+					Automattic\WooCommerce\Admin\Features\Navigation\Menu::add_plugin_item(
+						array(
+							'id'         => 'cocart-carts-in-session-page',
+							'title'      => esc_html__( 'Carts in Session', 'cocart-carts-in-session' ),
+							'capability' => apply_filters( 'cocart_screen_capability', 'manage_options' ),
+							'url'        => 'cocart-carts-in-session',
+						)
+					);
+				} else {
+					Automattic\WooCommerce\Admin\Features\Navigation\Menu::add_plugin_item(
+						array(
+							'id'         => 'cocart-carts-in-session-page',
+							'title'      => esc_html__( 'Carts in Session', 'cocart-carts-in-session' ),
+							'capability' => apply_filters( 'cocart_screen_capability', 'manage_options' ),
+							'url'        => 'cocart-carts-in-session',
+							'parent'     => 'cocart-category'
+						)
+					);
+				}
 			}
 		}
 
