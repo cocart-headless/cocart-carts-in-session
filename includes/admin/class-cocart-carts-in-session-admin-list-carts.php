@@ -519,7 +519,11 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 * @return Array $sortable
 		 */
 		public function get_sortable_columns() {
-			return $sortable = apply_filters( 'cocart_carts_in_session_sortable_columns', array() );
+			return $sortable = apply_filters( 'cocart_carts_in_session_sortable_columns', array(
+				'cart_key'     => array( 'cart_key', true ),
+				'date_created' => array( 'date_created', true ),
+				'date_expires' => array( 'date_expires', true ),
+			) );
 		}
 
 		/**
