@@ -693,7 +693,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 			 * If using a version of CoCart lower than v3 it will display under "Extensions".
 			 */
 			if ( class_exists( '\Automattic\WooCommerce\Admin\Features\Navigation\Menu' ) ) {
-				if ( version_compare( CoCart_Helpers::get_cocart_version(), '3.0.0', '<' ) ) {
+				if ( defined( 'COCART_VERSION' ) && version_compare( CoCart_Helpers::get_cocart_version(), '3.0.0', '<' ) ) {
 					Automattic\WooCommerce\Admin\Features\Navigation\Menu::add_plugin_item(
 						array(
 							'id'         => 'cocart-carts-in-session-page',

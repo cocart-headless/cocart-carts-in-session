@@ -58,6 +58,8 @@ final class CoCart_Carts_in_Session {
 		// Load translation files.
 		add_action( 'init', array( __CLASS__, 'load_plugin_textdomain' ), 0 );
 
+		add_action( 'init', array( __CLASS__, 'check_cocart_installed' ) );
+
 		// Plugin activation and deactivation.
 		register_activation_hook( COCART_CIS_FILE, array( __CLASS__, 'activated' ) );
 		register_deactivation_hook( COCART_CIS_FILE, array( __CLASS__, 'deactivated' ) );
@@ -166,6 +168,62 @@ final class CoCart_Carts_in_Session {
 			unset( $_GET['activate'] );
 		}
 	} // END deactivate_plugin()
+
+	/**
+	 * Checks if CoCart is installed.
+	 *
+	 * @access public
+	 * @return bool|void
+	 */
+	public function check_cocart_installed() {
+		if ( ! defined( 'COCART_VERSION' ) ) {
+			add_action( 'admin_notices', array( __CLASS__, 'cocart_not_installed' ) );
+
+			self::deactivate_plugin();
+			return false;
+		}
+	} // END check_cocart_installed()
+
+	/**
+	 * CoCart is Not Installed Notice.
+	 *
+	 * @access public
+	 * @global string $pagenow
+	 * @return void
+	 */
+	public function cocart_not_installed() {
+		global $pagenow;
+
+		if ( $pagenow == 'update.php' ) {
+			return false;
+		}
+
+		echo '<div class="notice notice-error">';
+
+			echo '<p>' . sprintf( __( '%1$s requires %2$s%3$s%4$s to be installed and activated.', 'cocart-carts-in-session' ), esc_html__( 'CoCart - Carts in Session', 'cocart-carts-in-session' ), '<strong>', '</strong>', 'CoCart' ) . '</p>';
+
+			echo '<p>';
+
+			if ( ! is_plugin_active( 'cart-rest-api-for-woocommerce/cart-rest-api-for-woocommerce.php' ) && current_user_can( 'activate_plugin', 'cart-rest-api-for-woocommerce/cart-rest-api-for-woocommerce.php' ) ) :
+
+				echo '<a href="' . esc_url( wp_nonce_url( self_admin_url( 'plugins.php?action=activate&plugin=' . 'cart-rest-api-for-woocommerce/cart-rest-api-for-woocommerce.php' . '&plugin_status=active' ), 'activate-plugin_' . 'cart-rest-api-for-woocommerce/cart-rest-api-for-woocommerce.php' ) ) . '" class="button button-primary">' . sprintf( esc_html__( 'Activate %s', 'cocart-carts-in-session' ), 'CoCart' ) . '</a> ';
+
+			else :
+
+				if ( current_user_can( 'install_plugins' ) ) {
+					$url = wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=cart-rest-api-for-woocommerce' ), 'install-plugin_cart-rest-api-for-woocommerce' );
+				} else {
+					$url = 'https://wordpress.org/plugins/cart-rest-api-for-woocommerce/';
+				}
+
+				echo '<a href="' . esc_url( $url ) . '" class="button button-primary">' . sprintf( esc_html__( 'Install %s', 'cocart-carts-in-session' ), 'CoCart' ) . '</a> ';
+
+			endif;
+
+			echo '</p>';
+
+		echo '</div>';
+	} // END cocart_not_installed()
 
 	/**
 	 * Load the plugin translations if any ready.
