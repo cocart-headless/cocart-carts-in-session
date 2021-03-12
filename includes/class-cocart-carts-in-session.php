@@ -173,9 +173,10 @@ final class CoCart_Carts_in_Session {
 	 * Checks if CoCart is installed.
 	 *
 	 * @access public
+	 * @static
 	 * @return bool|void
 	 */
-	public function check_cocart_installed() {
+	public static function check_cocart_installed() {
 		if ( ! defined( 'COCART_VERSION' ) ) {
 			add_action( 'admin_notices', array( __CLASS__, 'cocart_not_installed' ) );
 
