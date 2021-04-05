@@ -191,10 +191,11 @@ final class CoCart_Carts_in_Session {
 	 * CoCart is Not Installed Notice.
 	 *
 	 * @access public
+	 * @static
 	 * @global string $pagenow
 	 * @return void
 	 */
-	public function cocart_not_installed() {
+	public static function cocart_not_installed() {
 		global $pagenow;
 
 		if ( $pagenow == 'update.php' ) {
