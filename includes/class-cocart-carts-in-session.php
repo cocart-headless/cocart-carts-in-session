@@ -162,6 +162,8 @@ final class CoCart_Carts_in_Session {
 	 * @static
 	 */
 	public static function deactivate_plugin() {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
 		deactivate_plugins( plugin_basename( COCART_CIS_FILE ) );
 
 		if ( isset( $_GET['activate'] ) ) {
