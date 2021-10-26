@@ -72,7 +72,7 @@
 		"stylelint-order": "5.0.0"
 	},
 	"dependencies": {
-		"stylelint": "14.0.0"
+		"stylelint": "14.0.1"
 	},
 	"engines": {
 		"node": ">=10.15.0",
