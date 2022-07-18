@@ -587,13 +587,6 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 
 			$data = $this->get_carts( $per_page, $current_page );
 
-			/*
-			* The WP_List_Table class does not handle pagination for us, so we need
-			* to ensure that the data is trimmed to only the current page. We can use
-			* array_slice() to do that.
-			*/
-			$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-
 			$total_items = $this->record_count();
 
 			$this->set_pagination_args( array(
