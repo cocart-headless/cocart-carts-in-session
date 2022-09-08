@@ -49,15 +49,15 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			}
 
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-item_count,
-			.cocart_page_cocart-carts-in-session .wp-list-table .column-date_created,
-			.cocart_page_cocart-carts-in-session .wp-list-table .column-date_expires,
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-cart_created,
+			.cocart_page_cocart-carts-in-session .wp-list-table .column-cart_expiry,
 			.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
 				width: 8.8ch;
 			}
 
 			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-item_count,
-			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-date_created,
-			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-date_expires,
+			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-cart_created,
+			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-cart_expiry,
 			body.has-woocommerce-navigation.cocart_page_cocart-carts-in-session .wp-list-table .column-value {
 				width: 10ch;
 			}
@@ -120,6 +120,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 * Filter the carts listed by status.
 		 *
 		 * @access protected
+		 *
 		 * @return Array $status_links
 		 */
 		protected function get_views() {
@@ -143,22 +144,24 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			$status_links['expiring'] = sprintf( __( '<a href="%s">Expiring (%s)</a>', 'cocart-carts-in-session' ), '#', CoCart_Admin_WC_System_Status::count_carts_expiring() );
 
 			return $status_links;
-		}
+		} // END get_views()
 
 		/**
 		 * Add extra markup in the toolbars before or after the list.
 		 * 
 		 * @access public
+		 *
 		 * @param string $which, helps you decide if you add the markup after (bottom) or before (top) the list.
 		 */
 		public function extra_tablenav( $which ) {
 			do_action( 'cocart_carts_in_session_table_' . $which );
-		}
+		} // END extra_tablenav()
 
 		/**
 		 * Displays a blank state should there be no carts in session.
 		 *
 		 * @access public
+		 *
 		 * @return void
 		 */
 		public function maybe_render_blank_state() {
@@ -171,17 +174,21 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 
 				echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions, .wrap .subsubsub  { display: none; } #posts-filter .tablenav.bottom { height: auto; } </style>';
 			}
-		}
+		} // END maybe_render_blank_state()
 
 		/**
 		 * Retrieve carts data from the database.
 		 *
 		 * @access public
+		 *
 		 * @static
-		 * @global $wpdb
-		 * @param  int $per_page
-		 * @param  int $page_number
-		 * @return mixed
+		 *
+		 * @global $wpdb The WordPress database object.
+		 *
+		 * @param int $per_page Number of carts to return.
+		 * @param int $page_number Page number.
+		 *
+		 * @return mixed Array of cart data or false if none found.
 		 */
 		public static function get_carts( $per_page = 20, $page_number = 1 ) {
 			global $wpdb;
@@ -207,18 +214,20 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			);
 
 			return $results;
-		}
+		} // END get_carts()
 
 		/**
 		 * Returns the count of carts in the database.
 		 *
 		 * @access public
+		 *
 		 * @static
-		 * @return String
+		 *
+		 * @return string Count of carts.
 		 */
 		public static function record_count() {
 			return CoCart_Admin_WC_System_Status::carts_in_session();
-		}
+		} // END record_count()
 
 		/**
 		 * Text displayed when no cart data is available.
@@ -227,15 +236,17 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 		 */
 		public function no_items() {
 			_e( 'No carts in session.', 'cocart-carts-in-session' );
-		}
+		} // END no_items()
 
 		/**
 		 * Render a column when no column specific method exist.
 		 *
 		 * @access public
-		 * @param  array  $item
-		 * @param  string $column_name
-		 * @return mixed
+		 *
+		 * @param array  $item        A singular item (one full row's worth of data).
+		 * @param string $column_name The name of the column to be processed.
+		 *
+		 * @return mixed Text or HTML to be placed inside the column <td>.
 		 */
 		public function column_default( $item, $column_name ) {
 			switch ( $column_name ) {
@@ -244,28 +255,31 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				case 'status':
 				case 'item_count':
 				case 'value':
-				case 'date_created':
-				case 'date_expires':
+				case 'cart_created':
+				case 'cart_expiry':
+				case 'source':
 					return $item[ $column_name ];
 				default:
 					return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 			}
-		}
+		} // END column_default()
 
 		/**
 		 * Method for cart key column.
 		 *
 		 * @access public
-		 * @param  Array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
 		public function column_cart_key( $item ) {
 			$cart_key = $item['cart_key'];
 
 			$view_cart = add_query_arg( array(
-				'page' => 'cocart-carts-in-session',
+				'page'   => 'cocart-carts-in-session',
 				'action' => 'view',
-				'cart' => $item['cart_key']
+				'cart'   => $item['cart_key']
 			), admin_url( 'admin.php' ) );
 
 			$actions = array(
@@ -274,14 +288,16 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			);
 
 			return $cart_key . $this->row_actions( $actions );
-		}
+		} // END column_cart_key()
 
 		/**
 		 * Method for name column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
 		public function column_name( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
@@ -295,14 +311,16 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			} else {
 				return '&ndash;';
 			}
-		}
+		} // END column_name()
 
 		/**
 		 * Method for email column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string
 		 */
 		public function column_email( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
@@ -314,14 +332,16 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			} else {
 				return '&ndash;';
 			}
-		}
+		} // END column_email()
 
 		/**
 		 * Method for phone column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
 		public function column_phone( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
@@ -333,14 +353,16 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			} else {
 				return '&ndash;';
 			}
-		}
+		} // END column_phone()
 
 		/**
 		 * Method for status column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
 		public function column_status( $item ) {
 			$tooltip = "";
@@ -359,7 +381,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 				$tooltip = wc_sanitize_tooltip( esc_html__( 'Cart will be expiring soon.', 'cocart-carts-in-session') );
 			}
 
-			// If the cart expiration is less than the time it is now then the cart status is "abondoned".
+			// If the cart expiration is less than the time it is now then the cart status is "abandoned".
 			if ( $time > $expires ) {
 				$status     = "abandoned"; // a.k.a "Expired"
 				$cart_value = maybe_unserialize( $item['cart_value'] );
@@ -381,14 +403,40 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			} else {
 				printf( '<mark class="cart-status %s"><span>%s</span></mark>', esc_attr( sanitize_html_class( 'status-' . $status ) ), esc_html( $this->get_cart_status_name( $status ) ) );
 			}
-		}
+		} // END column_status()
+
+		/**
+		 * Method for cart source column.
+		 *
+		 * @access public
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
+		 */
+		public function column_source( $item ) {
+			$cart_source = $item['cart_source'];
+
+			switch( $cart_source ) {
+				case 'woocommerce':
+					$source = esc_html__( 'Native', 'cocart-carts-in-session' );
+					break;
+				case 'cocart':
+					$source = esc_html__( 'Headless', 'cocart-carts-in-session' );
+					break;
+			}
+
+			return $source;
+		} // END column_source()
 
 		/**
 		 * Method for item count column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
 		public function column_item_count( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
@@ -401,14 +449,16 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			}
 
 			return $item_count;
-		}
+		} // END column_item_count()
 
 		/**
 		 * Method for cart value column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
 		public function column_value( $item ) {
 			$cart_value = maybe_unserialize( $item['cart_value'] );
@@ -419,16 +469,18 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			}
 
 			return ( ! is_array( $cart_value ) ) ? wc_price( $cart_value ) : wc_price( 0 );
-		}
+		} // END column_value()
 
 		/**
 		 * Method for cart created column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
-		public function column_date_created( $item ) {
+		public function column_cart_created( $item ) {
 			$timestamp = isset( $item['cart_created'] ) ? $item['cart_created'] : '';
 
 			if ( ! $timestamp ) {
@@ -453,16 +505,18 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			}
 
 			return '<time datetime="' . $h_time . '" title="' . $h_time . '">' . esc_html( $show_date ) . '</time>';
-		}
+		} // END column_cart_created()
 
 		/**
 		 * Method for cart expires column.
 		 *
 		 * @access public
-		 * @param  array $item an array of DB data
-		 * @return String
+		 *
+		 * @param array $item an array of DB data.
+		 *
+		 * @return string HTML markup for the column.
 		 */
-		public function column_date_expires( $item ) {
+		public function column_cart_expiry( $item ) {
 			$timestamp = isset( $item['cart_expiry'] ) ? $item['cart_expiry'] : '';
 
 			if ( ! $timestamp ) {
@@ -487,74 +541,79 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			}
 
 			return '<time datetime="' . $h_time . '" title="' . $h_time . '">' . esc_html( $show_date ). '</time>';
-		}
+		} // END column_cart_expiry()
 
 		/**
 		 *  Define the columns that are going to be used in the table.
 		 *
 		 * @access public
-		 * @return Array
+		 *
+		 * @return array Array of columns to use with the table.
 		 */
 		public function get_columns() {
-			return $columns = apply_filters( 'cocart_carts_in_session_columns', array(
+			return apply_filters( 'cocart_carts_in_session_columns', array(
 				'cart_key'     => __( 'Cart Key', 'cocart-carts-in-session' ),
 				'name'         => __( 'Name Captured', 'cocart-carts-in-session' ),
 				'email'        => __( 'Email Captured', 'cocart-carts-in-session' ),
 				'phone'        => __( 'Phone Captured', 'cocart-carts-in-session' ),
 				'status'       => __( 'Status', 'cocart-carts-in-session' ),
+				'source'       => __( 'Source', 'cocart-carts-in-session' ),
 				'item_count'   => __( 'No. Items', 'cocart-carts-in-session' ),
-				'date_created' => __( 'Cart Created', 'cocart-carts-in-session' ),
-				'date_expires' => __( 'Cart Expires', 'cocart-carts-in-session' ),
+				'cart_created' => __( 'Cart Created', 'cocart-carts-in-session' ),
+				'cart_expiry' => __( 'Cart Expires', 'cocart-carts-in-session' ),
 				'value'        => __( 'Cart Value', 'cocart-carts-in-session' ),
 			) );
-		}
+		} // END get_columns()
 
 		/**
 		 * Define which columns are hidden.
 		 *
 		 * @access public
-		 * @return Array $hidden
+		 *
+		 * @return array $hidden Array of hidden columns.
 		 */
 		public function get_hidden_columns() {
 			return $hidden = apply_filters( 'cocart_carts_in_session_hidden_columns', array() );
-		}
+		} // END get_hidden_columns()
 
 		/**
 		 * Define which columns are sortable.
 		 *
 		 * @access public
-		 * @return Array $sortable
+		 *
+		 * @return array $sortable Array of sortable columns.
 		 */
 		public function get_sortable_columns() {
-			return $sortable = apply_filters( 'cocart_carts_in_session_sortable_columns', array(
+			return apply_filters( 'cocart_carts_in_session_sortable_columns', array(
 				'cart_key'     => array( 'cart_key', true ),
-				'date_created' => array( 'date_created', true ),
-				'date_expires' => array( 'date_expires', true ),
+				'cart_created' => array( 'cart_created', true ),
+				'cart_expiry' => array( 'cart_expiry', true ),
 			) );
-		}
+		} // END get_sortable_columns()
 
 		/**
 		 * Gets a list of cart statuses.
 		 *
 		 * @access public
-		 * @return Array $cart_statuses
+		 *
+		 * @return array $cart_statuses Array of cart statuses.
 		 */
 		public function get_cart_statuses() {
-			$cart_statuses = array(
+			return apply_filters( 'cocart_carts_in_session_statuses', array(
 				'cocart-abandoned' => _x( 'Abandoned', 'Cart status', 'cocart-carts-in-session' ),
 				'cocart-active'    => _x( 'Active', 'Cart status', 'cocart-carts-in-session' ),
 				'cocart-expiring'  => _x( 'Expiring', 'Cart status', 'cocart-carts-in-session' ),
-			);
-
-			return apply_filters( 'cocart_carts_in_session_statuses', $cart_statuses );
-		}
+			) );
+		} // END get_cart_statuses()
 
 		/**
 		 * Get the nice name for an cart status.
 		 *
 		 * @access public
-		 * @param  string $status Status.
-		 * @return String
+		 *
+		 * @param string $status Status.
+		 *
+		 * @return string $status_name Nice name for the status.
 		 */
 		public function get_cart_status_name( $status ) {
 			$statuses = $this->get_cart_statuses();
@@ -562,12 +621,13 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			$status   = isset( $statuses[ 'cocart-' . $status ] ) ? $statuses[ 'cocart-' . $status ] : $status;
 
 			return $status;
-		}
+		} // END get_cart_status_name()
 
 		/**
 		 * Handles data query and filter, sorting, and pagination.
 		 *
 		 * @access public
+		 *
 		 * @return void
 		 */
 		public function prepare_items() {
@@ -587,13 +647,6 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 
 			$data = $this->get_carts( $per_page, $current_page );
 
-			/*
-			* The WP_List_Table class does not handle pagination for us, so we need
-			* to ensure that the data is trimmed to only the current page. We can use
-			* array_slice() to do that.
-			*/
-			$data = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
-
 			$total_items = $this->record_count();
 
 			$this->set_pagination_args( array(
@@ -603,7 +656,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session_List' ) ) {
 			 ) );
 
 			$this->items = $data;
-		}
+		} // END prepare_items()
 
 	} // END class
 
@@ -626,6 +679,8 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 		/**
 		 * Sets the number of carts to show on screen per page.
 		 *
+		 * @access public
+		 *
 		 * @param [type] $status
 		 * @param [type] $option
 		 * @param [type] $value
@@ -639,6 +694,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 		 * Adds "Carts in Session" admin menu and page.
 		 *
 		 * @access public
+		 *
 		 * @return void
 		 */
 		public function carts_in_session() {
@@ -720,6 +776,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 		 * Lists the carts in session.
 		 *
 		 * @access public
+		 *
 		 * @return void
 		 */
 		public function list_carts_page() {
@@ -737,12 +794,13 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 				<div class="clear"></div>
 			</div>
 		<?php
-		}
+		} // END list_carts_page()
 
 		/**
 		 * Screen options.
 		 *
 		 * @access public
+		 *
 		 * @return void
 		 */
 		public function screen_option() {
@@ -753,7 +811,7 @@ if ( ! class_exists( 'CoCart_Admin_Carts_in_Session' ) ) {
 			);
 
 			add_screen_option( 'per_page', $args );
-		}
+		} // END screen_option()
 
 	} // END class
 
